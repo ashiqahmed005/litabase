@@ -1,0 +1,52 @@
+# Development overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Services started by dev.sh:
+#   • postgres    — app database         (localhost:5432)
+#   • example-db  — e-commerce demo DB   (localhost:5433)
+#
+# Backend and frontend run natively via npm (not in Docker) for fast hot-reload.
+
+services:
+  postgres:
+    restart: unless-stopped
+    ports:
+      - "5432:5432"   # expose for local tools (TablePlus, DBeaver, psql)
+
+  backend:
+    restart: unless-stopped
+    build:
+      context: ./backend
+      target: dev
+    environment:
+      NODE_ENV: development
+      # SSL disabled — local postgres container has no SSL cert
+    volumes:
+      - ./backend/src:/app/src   # hot-reload: source changes reflected without rebuild
+    ports:
+      - "3000:3000"              # expose for direct API testing
+
+  # ── Example database ──────────────────────────────────────────────────────
+  # Pre-loaded e-commerce dataset (customers, products, orders, …).
+  # Connect via Litabase using:
+  #   host: localhost  port: 5433  db: shop  user: demo  password: demo
+  example-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shop
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+    ports:
+      - "5433:5432"   # different host port to avoid clash with main postgres
+    volumes:
+      - ./example-db/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+      - example_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d shop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  example_db_data:
