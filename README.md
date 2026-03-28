@@ -1,6 +1,6 @@
 # Litabase
 
-A lightweight self-hosted BI dashboard. Connect to your databases, write SQL queries, build dashboards with charts, and schedule automated email reports — all from a single web UI.
+A lightweight self-hosted BI dashboard inspired from metabase. Connect to your databases, write SQL queries, build dashboards with charts, and schedule automated email reports — all from a single web UI.
 
 [![CI](https://github.com/ashiqahmed005/litabase/actions/workflows/ci.yml/badge.svg)](https://github.com/ashiqahmed005/litabase/actions/workflows/ci.yml)
 [![Docker](https://github.com/ashiqahmed005/litabase/actions/workflows/docker.yml/badge.svg)](https://github.com/ashiqahmed005/litabase/actions/workflows/docker.yml)
