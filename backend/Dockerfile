@@ -7,11 +7,11 @@ FROM base AS dev
 RUN npm install                  # includes devDependencies (nodemon)
 COPY src ./src
 EXPOSE 3000
-CMD ["node_modules/.bin/nodemon", "src/app.js"]
+CMD ["node_modules/.bin/nodemon", "src/server.js"]
 
 # ===== Production stage =====
 FROM base AS prod
 RUN npm install --production     # no devDependencies
 COPY src ./src
 EXPOSE 3000
-CMD ["node", "src/app.js"]
+CMD ["node", "src/server.js"]
