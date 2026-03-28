@@ -2,7 +2,12 @@
 
 A lightweight self-hosted BI dashboard. Connect to your databases, write SQL queries, build dashboards with charts, and schedule automated email reports — all from a single web UI.
 
-![CI](https://github.com/your-org/litabase/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/ashiqahmed005/litabase/actions/workflows/ci.yml/badge.svg)](https://github.com/ashiqahmed005/litabase/actions/workflows/ci.yml)
+[![Docker](https://github.com/ashiqahmed005/litabase/actions/workflows/docker.yml/badge.svg)](https://github.com/ashiqahmed005/litabase/actions/workflows/docker.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Last commit](https://img.shields.io/github/last-commit/ashiqahmed005/litabase)](https://github.com/ashiqahmed005/litabase/commits/main)
+[![Open issues](https://img.shields.io/github/issues/ashiqahmed005/litabase)](https://github.com/ashiqahmed005/litabase/issues)
 
 ---
 
