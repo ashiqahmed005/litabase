@@ -45,7 +45,7 @@ export function signal(initial) {
 export function computed(fn, ...deps) {
   const sig = signal(fn());
   deps.forEach(dep => dep.subscribe(() => sig.set(fn())));
-  return { get: () => sig.get(), subscribe: (fn) => sig.subscribe(fn) };
+  return { get: () => sig.get(), subscribe: (cb) => sig.subscribe(cb) };
 }
 
 // Reactive side effect — runs fn immediately, then re-runs whenever a dep changes.

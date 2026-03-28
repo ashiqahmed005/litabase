@@ -3,6 +3,7 @@
 //   items$ — signal<null | Connection[]>  (null = loading)
 import { Component } from '../framework/component.js';
 import { loadingEl, emptyStateEl } from '../ui/states.js';
+import { h } from '../core/dom.js';
 
 export class ConnectionList extends Component {
   onMount() {
@@ -11,31 +12,24 @@ export class ConnectionList extends Component {
 
   render() {
     const items = this.props.items$.get();
-    const ul = document.createElement('ul');
-    ul.className = 'list';
-    ul.setAttribute('role', 'list');
+    const ul = h('ul', { class: 'list', role: 'list' });
 
     if (items === null) { ul.appendChild(loadingEl()); return ul; }
     if (!items.length)  { ul.appendChild(emptyStateEl('⊕', 'No connections yet.')); return ul; }
 
     items.forEach(conn => {
-      const li = document.createElement('li');
-      li.className = 'list-item';
-      li.setAttribute('role', 'listitem');
-      li.innerHTML = `
-        <div class="list-item-main">
-          <div class="list-item-title"></div>
-          <div class="list-item-sub"></div>
-        </div>
-        <div class="list-item-actions">
-          <button type="button" class="btn btn-sm btn-secondary">Test</button>
-          <button type="button" class="btn btn-sm btn-danger">Delete</button>
-        </div>`;
-      li.querySelector('.list-item-title').textContent = conn.name;
-      li.querySelector('.list-item-sub').textContent   = `${conn.type} · ${conn.host || conn.database_name || ''}`;
-      li.querySelectorAll('button')[0].addEventListener('click', () => this.props.onTest(conn.id));
-      li.querySelectorAll('button')[1].addEventListener('click', () => this.props.onDelete(conn.id));
-      ul.appendChild(li);
+      ul.appendChild(
+        h('li', { class: 'list-item', role: 'listitem' },
+          h('div', { class: 'list-item-main' },
+            h('div', { class: 'list-item-title' }, conn.name),
+            h('div', { class: 'list-item-sub' }, `${conn.type} · ${conn.host || conn.database_name || ''}`),
+          ),
+          h('div', { class: 'list-item-actions' },
+            h('button', { type: 'button', class: 'btn btn-sm btn-secondary', onClick: () => this.props.onTest(conn.id) }, 'Test'),
+            h('button', { type: 'button', class: 'btn btn-sm btn-danger',    onClick: () => this.props.onDelete(conn.id) }, 'Delete'),
+          ),
+        ),
+      );
     });
 
     return ul;

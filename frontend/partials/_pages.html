@@ -1,62 +1,83 @@
 <!-- Dashboards list -->
 <section id="page-dashboards" class="page" aria-labelledby="heading-dashboards">
-  <div class="page-header">
-    <h2 id="heading-dashboards">Dashboards</h2>
-    <button type="button" class="btn btn-primary" id="new-dashboard-btn">+ New Dashboard</button>
+  <div class="panel-topbar">
+    <div class="panel-breadcrumb">
+      <span class="panel-bc-root">◈ Litabase</span>
+      <span class="panel-bc-sep">/</span>
+      <span id="heading-dashboards" class="panel-bc-current">Dashboards</span>
+    </div>
+    <div class="panel-actions">
+      <button type="button" class="btn btn-primary" id="new-dashboard-btn">+ New Dashboard</button>
+    </div>
   </div>
-  <div id="dashboards-grid" class="card-grid" role="list"></div>
+  <div class="panel-body">
+    <div id="dashboards-grid" class="card-grid" role="list"></div>
+  </div>
 </section>
 
 <!-- Single dashboard view -->
 <section id="page-dashboard-view" class="page hidden" aria-labelledby="dashboard-title">
-  <div class="page-header">
-    <button type="button" class="btn-link back-btn" data-page="dashboards">← Back</button>
-    <h2 id="dashboard-title"></h2>
-    <div class="header-actions">
+  <div class="panel-topbar">
+    <div class="panel-breadcrumb">
+      <span class="panel-bc-root">◈ Litabase</span>
+      <span class="panel-bc-sep">/</span>
+      <button type="button" class="panel-bc-link back-btn" data-page="dashboards">Dashboards</button>
+      <span class="panel-bc-sep">/</span>
+      <span id="dashboard-title" class="panel-bc-current"></span>
+    </div>
+    <div class="panel-actions">
       <button type="button" class="btn btn-secondary" id="add-widget-btn">+ Add Widget</button>
       <button type="button" class="btn btn-danger" id="delete-dashboard-btn">Delete</button>
     </div>
   </div>
-  <div id="dashboard-widgets" class="widgets-grid"></div>
+  <div class="panel-body">
+    <div id="dashboard-widgets" class="widgets-grid"></div>
+  </div>
 </section>
 
 <!-- SQL Editor -->
 <section id="page-editor" class="page hidden" aria-labelledby="heading-editor">
-  <div class="page-header">
-    <h2 id="heading-editor">SQL Editor</h2>
-  </div>
-  <div class="editor-layout">
-    <div class="editor-toolbar">
+  <div class="panel-topbar">
+    <div class="panel-breadcrumb">
+      <span class="panel-bc-root">◈ Litabase</span>
+      <span class="panel-bc-sep">/</span>
+      <span id="heading-editor" class="panel-bc-current">SQL Editor</span>
+    </div>
+    <div class="panel-actions">
       <label for="connection-select" class="sr-only">Connection</label>
-      <select id="connection-select" class="select"></select>
-      <button type="button" class="btn btn-primary" id="run-query-btn">▶ Run</button>
-      <button type="button" class="btn btn-secondary" id="save-query-btn">Save Query</button>
+      <select id="connection-select" class="select select-sm"></select>
+      <button type="button" class="btn btn-primary btn-sm" id="run-query-btn">▶ Run</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="save-query-btn">Save Query</button>
       <span id="exec-time" class="exec-time" aria-live="polite"></span>
     </div>
-    <div id="sql-editor" class="sql-editor-wrap" role="textbox" aria-multiline="true"
-         aria-label="SQL editor"></div>
-    <div id="results-section" class="results-section hidden" aria-live="polite" aria-atomic="false">
-      <div class="results-toolbar">
-        <span id="results-count" class="results-count"></span>
-        <div class="chart-controls">
-          <label for="chart-type-select" class="sr-only">Chart type</label>
-          <select id="chart-type-select" class="select select-sm">
-            <option value="table">Table</option>
-            <option value="bar">Bar Chart</option>
-            <option value="line">Line Chart</option>
-            <option value="pie">Pie Chart</option>
-            <option value="scatter">Scatter Plot</option>
-          </select>
-          <label for="chart-x-col" class="sr-only">X axis column</label>
-          <select id="chart-x-col" class="select select-sm hidden"></select>
-          <label for="chart-y-col" class="sr-only">Y axis column</label>
-          <select id="chart-y-col" class="select select-sm hidden"></select>
+  </div>
+  <div class="panel-body">
+    <div class="editor-layout">
+      <div id="sql-editor" class="sql-editor-wrap" role="textbox" aria-multiline="true"
+           aria-label="SQL editor"></div>
+      <div id="results-section" class="results-section hidden" aria-live="polite" aria-atomic="false">
+        <div class="results-toolbar">
+          <span id="results-count" class="results-count"></span>
+          <div class="chart-controls">
+            <label for="chart-type-select" class="sr-only">Chart type</label>
+            <select id="chart-type-select" class="select select-sm">
+              <option value="table">Table</option>
+              <option value="bar">Bar Chart</option>
+              <option value="line">Line Chart</option>
+              <option value="pie">Pie Chart</option>
+              <option value="scatter">Scatter Plot</option>
+            </select>
+            <label for="chart-x-col" class="sr-only">X axis column</label>
+            <select id="chart-x-col" class="select select-sm hidden"></select>
+            <label for="chart-y-col" class="sr-only">Y axis column</label>
+            <select id="chart-y-col" class="select select-sm hidden"></select>
+          </div>
+          <button type="button" class="btn btn-sm" id="export-csv-btn">Export CSV</button>
         </div>
-        <button type="button" class="btn btn-sm" id="export-csv-btn">Export CSV</button>
-      </div>
-      <div id="results-table-wrap" class="results-table-wrap"></div>
-      <div id="results-chart-wrap" class="results-chart-wrap hidden">
-        <canvas id="results-chart" role="img" aria-label="Query result chart"></canvas>
+        <div id="results-table-wrap" class="results-table-wrap"></div>
+        <div id="results-chart-wrap" class="results-chart-wrap hidden">
+          <canvas id="results-chart" role="img" aria-label="Query result chart"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -64,30 +85,52 @@
 
 <!-- Saved Queries -->
 <section id="page-queries" class="page hidden" aria-labelledby="heading-queries">
-  <div class="page-header">
-    <h2 id="heading-queries">Saved Queries</h2>
+  <div class="panel-topbar">
+    <div class="panel-breadcrumb">
+      <span class="panel-bc-root">◈ Litabase</span>
+      <span class="panel-bc-sep">/</span>
+      <span id="heading-queries" class="panel-bc-current">Saved Queries</span>
+    </div>
   </div>
-  <input type="search" id="queries-search" class="search-input"
-         placeholder="Search queries…" aria-label="Search saved queries" />
-  <div id="queries-list" class="list-view" role="list"></div>
+  <div class="panel-body">
+    <input type="search" id="queries-search" class="search-input"
+           placeholder="Search queries…" aria-label="Search saved queries" />
+    <div id="queries-list" class="list-view" role="list"></div>
+  </div>
 </section>
 
 <!-- Connections -->
 <section id="page-connections" class="page hidden" aria-labelledby="heading-connections">
-  <div class="page-header">
-    <h2 id="heading-connections">Connections</h2>
-    <button type="button" class="btn btn-primary" id="new-connection-btn">+ New Connection</button>
+  <div class="panel-topbar">
+    <div class="panel-breadcrumb">
+      <span class="panel-bc-root">◈ Litabase</span>
+      <span class="panel-bc-sep">/</span>
+      <span id="heading-connections" class="panel-bc-current">Connections</span>
+    </div>
+    <div class="panel-actions">
+      <button type="button" class="btn btn-primary" id="new-connection-btn">+ New Connection</button>
+    </div>
   </div>
-  <input type="search" id="connections-search" class="search-input"
-         placeholder="Search connections…" aria-label="Search connections" />
-  <div id="connections-list" class="list-view" role="list"></div>
+  <div class="panel-body">
+    <input type="search" id="connections-search" class="search-input"
+           placeholder="Search connections…" aria-label="Search connections" />
+    <div id="connections-list" class="list-view" role="list"></div>
+  </div>
 </section>
 
 <!-- Scheduled Reports -->
 <section id="page-schedules" class="page hidden" aria-labelledby="heading-schedules">
-  <div class="page-header">
-    <h2 id="heading-schedules">Scheduled Reports</h2>
-    <button type="button" class="btn btn-primary" id="new-schedule-btn">+ New Schedule</button>
+  <div class="panel-topbar">
+    <div class="panel-breadcrumb">
+      <span class="panel-bc-root">◈ Litabase</span>
+      <span class="panel-bc-sep">/</span>
+      <span id="heading-schedules" class="panel-bc-current">Scheduled Reports</span>
+    </div>
+    <div class="panel-actions">
+      <button type="button" class="btn btn-primary" id="new-schedule-btn">+ New Schedule</button>
+    </div>
   </div>
-  <div id="schedules-list" class="list-view" role="list"></div>
+  <div class="panel-body">
+    <div id="schedules-list" class="list-view" role="list"></div>
+  </div>
 </section>

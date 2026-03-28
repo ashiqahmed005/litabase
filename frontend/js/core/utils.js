@@ -32,4 +32,14 @@ export const Utils = {
     a.click();
     URL.revokeObjectURL(url);
   },
+
+  // Returns a debounced version of fn that delays invocation until
+  // ms milliseconds have elapsed since the last call.
+  debounce(fn, ms = 300) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), ms);
+    };
+  },
 };

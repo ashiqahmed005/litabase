@@ -43,7 +43,7 @@ export class Component {
     const el = document.createElement('div');
     el.className = 'empty-state';
     const p = document.createElement('p');
-    p.style.color = 'var(--danger)';
+    p.className = 'error-text';
     p.textContent = `Something went wrong: ${err.message}`;
     el.appendChild(p);
     return el;
@@ -106,6 +106,7 @@ export class Component {
   // (used before update() where replaceWith() handles DOM cleanup).
   _releaseChildren() {
     this._children.forEach(c => {
+      c.onDestroy?.();
       c._subs.forEach(u => u());
       c._releaseChildren?.();
       c._subs     = [];

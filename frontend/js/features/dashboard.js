@@ -9,6 +9,7 @@ import { Toast } from '../ui/toast.js';
 import { DashboardGrid } from '../components/DashboardGrid.js';
 import { DashboardService } from '../services/dashboard.service.js';
 import { WidgetsFeature } from './widgets.js';
+import { h } from '../core/dom.js';
 
 // ── Reactive state ────────────────────────────────────────────────────────────
 const items$          = signal(null);
@@ -17,22 +18,20 @@ let _grid             = null;
 
 // ── Form factory ──────────────────────────────────────────────────────────────
 function _newDashboardFormEl() {
-  const div = document.createElement('div');
-  div.className = 'form';
-  div.innerHTML = `
-    <div class="form-group">
-      <label for="new-dash-name">Dashboard Name</label>
-      <input class="form-input" id="new-dash-name" placeholder="e.g. Sales Overview" />
-    </div>
-    <div class="form-group">
-      <label for="new-dash-desc">Description</label>
-      <textarea class="form-textarea" id="new-dash-desc" placeholder="Optional description"></textarea>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="create-dash-btn">Create</button>
-    </div>`;
-  return div;
+  return h('div', { class: 'form' },
+    h('div', { class: 'form-group' },
+      h('label', { for: 'new-dash-name' }, 'Dashboard Name'),
+      h('input', { class: 'form-input', id: 'new-dash-name', placeholder: 'e.g. Sales Overview' }),
+    ),
+    h('div', { class: 'form-group' },
+      h('label', { for: 'new-dash-desc' }, 'Description'),
+      h('textarea', { class: 'form-textarea', id: 'new-dash-desc', placeholder: 'Optional description' }),
+    ),
+    h('div', { class: 'modal-footer' },
+      h('button', { type: 'button', class: 'btn btn-secondary', 'data-dismiss': 'modal' }, 'Cancel'),
+      h('button', { type: 'button', class: 'btn btn-primary', id: 'create-dash-btn' }, 'Create'),
+    ),
+  );
 }
 
 // ── Private handlers ──────────────────────────────────────────────────────────
@@ -72,13 +71,19 @@ function _openNewModal() {
   });
 }
 
-async function _deleteCurrent() {
-  if (!confirm('Delete this dashboard and all its widgets?')) return;
-  try {
-    await DashboardService.delete(Store.getDashboardId());
-    Toast.success('Dashboard deleted');
-    Router.navigate('dashboards');
-  } catch(err) { Toast.error(err.message); }
+function _deleteCurrent() {
+  Modal.confirm({
+    title:        'Delete Dashboard',
+    message:      'This will permanently delete the dashboard and all its widgets.',
+    confirmLabel: 'Delete',
+    onConfirm: async () => {
+      try {
+        await DashboardService.delete(Store.getDashboardId());
+        Toast.success('Dashboard deleted');
+        Router.navigate('dashboards');
+      } catch(err) { Toast.error(err.message); }
+    },
+  });
 }
 
 // ── Public ────────────────────────────────────────────────────────────────────

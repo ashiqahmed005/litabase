@@ -7,6 +7,7 @@
 import Sortable from 'sortablejs';
 import { Component } from '../framework/component.js';
 import { emptyStateEl } from '../ui/states.js';
+import { h } from '../core/dom.js';
 
 export class WidgetGrid extends Component {
   constructor(props) {
@@ -48,17 +49,14 @@ export class WidgetGrid extends Component {
     }
 
     widgets.forEach(w => {
-      const card = document.createElement('div');
-      card.className = 'widget-card';
-      card.dataset.widgetId = w.id;
-      card.innerHTML = `
-        <div class="widget-title">
-          <span class="widget-title-text"></span>
-          <button type="button" class="btn-link" aria-label="Remove widget">×</button>
-        </div>
-        <div class="widget-content widget-loading" id="widget-content-${w.id}">Loading...</div>`;
-      card.querySelector('.widget-title-text').textContent = w.title || w.query_name || 'Widget';
-      card.querySelector('button').addEventListener('click', () => this.props.onDelete(w.id));
+      const card = h('div', { class: 'widget-card', 'data-widget-id': w.id },
+        h('div', { class: 'widget-title' },
+          h('span', { class: 'widget-title-text' }, w.title || w.query_name || 'Widget'),
+          h('button', { type: 'button', class: 'btn-link', 'aria-label': 'Remove widget',
+                        onClick: () => this.props.onDelete(w.id) }, '×'),
+        ),
+        h('div', { class: 'widget-content widget-loading', id: `widget-content-${w.id}` }, 'Loading...'),
+      );
       grid.appendChild(card);
     });
 

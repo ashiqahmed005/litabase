@@ -2,12 +2,14 @@
 import Fuse from 'fuse.js';
 
 import { signal } from '../framework/signal.js';
+import { Utils } from '../core/utils.js';
 import { Events } from '../framework/events.js';
 import { Router } from '../core/router.js';
 import { Modal } from '../ui/modal.js';
 import { Toast } from '../ui/toast.js';
 import { ConnectionList } from '../components/ConnectionList.js';
 import { ConnectionService } from '../services/connection.service.js';
+import { h } from '../core/dom.js';
 
 // ── Reactive state ────────────────────────────────────────────────────────────
 const items$  = signal(null);
@@ -17,58 +19,56 @@ let _list     = null;
 
 // ── Form factory ──────────────────────────────────────────────────────────────
 function _newConnectionFormEl() {
-  const div = document.createElement('div');
-  div.className = 'form';
-  div.innerHTML = `
-    <div class="form-group">
-      <label for="conn-name">Connection Name</label>
-      <input class="form-input" id="conn-name" placeholder="e.g. Production DB" />
-    </div>
-    <div class="form-group">
-      <label for="conn-type">Type</label>
-      <select class="select" id="conn-type">
-        <option value="postgres">PostgreSQL</option>
-        <option value="mysql">MySQL</option>
-        <option value="sqlite">SQLite</option>
-      </select>
-    </div>
-    <div id="conn-host-fields">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="conn-host">Host</label>
-          <input class="form-input" id="conn-host" placeholder="localhost" />
-        </div>
-        <div class="form-group">
-          <label for="conn-port">Port</label>
-          <input class="form-input" id="conn-port" type="number" placeholder="5432" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="conn-database">Database</label>
-          <input class="form-input" id="conn-database" placeholder="mydb" />
-        </div>
-        <div class="form-group">
-          <label for="conn-username">Username</label>
-          <input class="form-input" id="conn-username" placeholder="postgres" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="conn-password">Password</label>
-        <input class="form-input" id="conn-password" type="password" placeholder="Password" />
-      </div>
-    </div>
-    <div id="conn-sqlite-fields" class="hidden">
-      <div class="form-group">
-        <label for="conn-sqlite-path">Database File Path</label>
-        <input class="form-input" id="conn-sqlite-path" placeholder="/data/mydb.sqlite" />
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="save-conn-btn">Save Connection</button>
-    </div>`;
-  return div;
+  return h('div', { class: 'form' },
+    h('div', { class: 'form-group' },
+      h('label', { for: 'conn-name' }, 'Connection Name'),
+      h('input', { class: 'form-input', id: 'conn-name', placeholder: 'e.g. Production DB' }),
+    ),
+    h('div', { class: 'form-group' },
+      h('label', { for: 'conn-type' }, 'Type'),
+      h('select', { class: 'select', id: 'conn-type' },
+        h('option', { value: 'postgres' }, 'PostgreSQL'),
+        h('option', { value: 'mysql' },    'MySQL'),
+        h('option', { value: 'sqlite' },   'SQLite'),
+      ),
+    ),
+    h('div', { id: 'conn-host-fields' },
+      h('div', { class: 'form-row' },
+        h('div', { class: 'form-group' },
+          h('label', { for: 'conn-host' }, 'Host'),
+          h('input', { class: 'form-input', id: 'conn-host', placeholder: 'localhost' }),
+        ),
+        h('div', { class: 'form-group' },
+          h('label', { for: 'conn-port' }, 'Port'),
+          h('input', { class: 'form-input', id: 'conn-port', type: 'number', placeholder: '5432' }),
+        ),
+      ),
+      h('div', { class: 'form-row' },
+        h('div', { class: 'form-group' },
+          h('label', { for: 'conn-database' }, 'Database'),
+          h('input', { class: 'form-input', id: 'conn-database', placeholder: 'mydb' }),
+        ),
+        h('div', { class: 'form-group' },
+          h('label', { for: 'conn-username' }, 'Username'),
+          h('input', { class: 'form-input', id: 'conn-username', placeholder: 'postgres' }),
+        ),
+      ),
+      h('div', { class: 'form-group' },
+        h('label', { for: 'conn-password' }, 'Password'),
+        h('input', { class: 'form-input', id: 'conn-password', type: 'password', placeholder: 'Password' }),
+      ),
+    ),
+    h('div', { id: 'conn-sqlite-fields', class: 'hidden' },
+      h('div', { class: 'form-group' },
+        h('label', { for: 'conn-sqlite-path' }, 'Database File Path'),
+        h('input', { class: 'form-input', id: 'conn-sqlite-path', placeholder: '/data/mydb.sqlite' }),
+      ),
+    ),
+    h('div', { class: 'modal-footer' },
+      h('button', { type: 'button', class: 'btn btn-secondary', 'data-dismiss': 'modal' }, 'Cancel'),
+      h('button', { type: 'button', class: 'btn btn-primary', id: 'save-conn-btn' }, 'Save Connection'),
+    ),
+  );
 }
 
 // ── Private handlers ──────────────────────────────────────────────────────────
@@ -110,14 +110,20 @@ async function _test(id) {
   } catch(err) { Toast.error(err.message); }
 }
 
-async function _delete(id) {
-  if (!confirm('Delete this connection? Saved queries using it will also be deleted.')) return;
-  try {
-    await ConnectionService.delete(id);
-    Toast.success('Connection deleted');
-    Events.emit('connection:deleted', { id });
-    _loadPage();
-  } catch(err) { Toast.error(err.message); }
+function _delete(id) {
+  Modal.confirm({
+    title: 'Delete Connection',
+    message: 'This will permanently delete the connection and all saved queries that use it.',
+    confirmLabel: 'Delete',
+    onConfirm: async () => {
+      try {
+        await ConnectionService.delete(id);
+        Toast.success('Connection deleted');
+        Events.emit('connection:deleted', { id });
+        _loadPage();
+      } catch(err) { Toast.error(err.message); }
+    },
+  });
 }
 
 async function _loadPage() {
@@ -171,10 +177,10 @@ export const ConnectionsFeature = {
       _loadPage();
     });
 
-    document.getElementById('connections-search').addEventListener('input', (e) => {
+    document.getElementById('connections-search').addEventListener('input', Utils.debounce((e) => {
       const term = e.target.value.trim();
       items$.set(term && _fuse ? _fuse.search(term).map(r => r.item) : _allConns);
-    });
+    }, 200));
 
     document.getElementById('new-connection-btn').addEventListener('click', _openNewModal);
   },

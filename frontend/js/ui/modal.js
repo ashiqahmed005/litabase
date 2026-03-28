@@ -19,6 +19,36 @@ export const Modal = {
     document.getElementById('modal').close();
   },
 
+  // Renders a safe confirmation dialog using the existing modal chrome.
+  // No native confirm() — stays in the app's design system.
+  confirm({ title, message, confirmLabel = 'Confirm', onConfirm }) {
+    const wrap = document.createElement('div');
+
+    const p = document.createElement('p');
+    p.className = 'confirm-message';
+    p.textContent = message;
+    wrap.appendChild(p);
+
+    const footer = document.createElement('div');
+    footer.className = 'modal-footer';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn btn-secondary';
+    cancelBtn.setAttribute('data-dismiss', 'modal');
+    cancelBtn.textContent = 'Cancel';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.className = 'btn btn-danger';
+    confirmBtn.textContent = confirmLabel;
+    confirmBtn.addEventListener('click', () => { Modal.close(); onConfirm(); });
+
+    footer.append(cancelBtn, confirmBtn);
+    wrap.appendChild(footer);
+    Modal.open(title, wrap);
+  },
+
   // Called once from app.js — wires the close button and backdrop click.
   init() {
     const dialog = document.getElementById('modal');

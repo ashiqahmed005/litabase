@@ -4,6 +4,7 @@
 import { Component } from '../framework/component.js';
 import { loadingEl, emptyStateEl } from '../ui/states.js';
 import { Utils } from '../core/utils.js';
+import { h } from '../core/dom.js';
 
 export class QueryList extends Component {
   onMount() {
@@ -12,31 +13,24 @@ export class QueryList extends Component {
 
   render() {
     const items = this.props.items$.get();
-    const ul = document.createElement('ul');
-    ul.className = 'list';
-    ul.setAttribute('role', 'list');
+    const ul = h('ul', { class: 'list', role: 'list' });
 
     if (items === null) { ul.appendChild(loadingEl()); return ul; }
     if (!items.length)  { ul.appendChild(emptyStateEl('⊙', 'No saved queries yet.')); return ul; }
 
     items.forEach(q => {
-      const li = document.createElement('li');
-      li.className = 'list-item';
-      li.setAttribute('role', 'listitem');
-      li.innerHTML = `
-        <div class="list-item-main">
-          <div class="list-item-title"></div>
-          <div class="list-item-sub"></div>
-        </div>
-        <div class="list-item-actions">
-          <button type="button" class="btn btn-sm btn-secondary">Open in Editor</button>
-          <button type="button" class="btn btn-sm btn-danger">Delete</button>
-        </div>`;
-      li.querySelector('.list-item-title').textContent = q.name;
-      li.querySelector('.list-item-sub').textContent   = `${q.connection_name || ''} · ${Utils.formatDate(q.updated_at)}`;
-      li.querySelectorAll('button')[0].addEventListener('click', () => this.props.onOpen(q.id));
-      li.querySelectorAll('button')[1].addEventListener('click', () => this.props.onDelete(q.id));
-      ul.appendChild(li);
+      ul.appendChild(
+        h('li', { class: 'list-item', role: 'listitem' },
+          h('div', { class: 'list-item-main' },
+            h('div', { class: 'list-item-title' }, q.name),
+            h('div', { class: 'list-item-sub' }, `${q.connection_name || ''} · ${Utils.formatDate(q.updated_at)}`),
+          ),
+          h('div', { class: 'list-item-actions' },
+            h('button', { type: 'button', class: 'btn btn-sm btn-secondary', onClick: () => this.props.onOpen(q.id) },   'Open in Editor'),
+            h('button', { type: 'button', class: 'btn btn-sm btn-danger',    onClick: () => this.props.onDelete(q.id) }, 'Delete'),
+          ),
+        ),
+      );
     });
 
     return ul;

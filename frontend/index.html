@@ -17,10 +17,29 @@
   <%- include('partials/_auth.html') %>
 
   <div id="app" class="app hidden">
-    <%- include('partials/_sidebar.html') %>
-    <main class="main-content" role="main">
-      <%- include('partials/_pages.html') %>
-    </main>
+
+    <header id="header">
+      <div class="header-brand">
+        <span class="header-logo">◈</span>
+        <div>
+          <div class="header-app-name">Litabase</div>
+          <div class="header-tagline">SQL workbench &amp; data explorer</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <span id="user-name" class="user-name"></span>
+        <button type="button" id="logout-btn" class="btn-link">Logout</button>
+        <button type="button" id="sidebar-toggle" class="sidebar-toggle" title="Toggle sidebar">☰</button>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <%- include('partials/_sidebar.html') %>
+      <main class="main-content" role="main">
+        <%- include('partials/_pages.html') %>
+      </main>
+    </div>
+
   </div>
 
   <%- include('partials/_modal.html') %>

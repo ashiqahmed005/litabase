@@ -15,28 +15,27 @@ import { Utils } from '../core/utils.js';
 import { Charts } from '../charts/charts.js';
 import { QueryService } from '../services/query.service.js';
 import { ConnectionsFeature } from './connections.js';
+import { h } from '../core/dom.js';
 
 let _editor     = null;
 let _lastResult = null;
 
 // ── Form factory ──────────────────────────────────────────────────────────────
 function _saveQueryFormEl() {
-  const div = document.createElement('div');
-  div.className = 'form';
-  div.innerHTML = `
-    <div class="form-group">
-      <label for="save-query-name">Query Name</label>
-      <input class="form-input" id="save-query-name" placeholder="e.g. Monthly Revenue" />
-    </div>
-    <div class="form-group">
-      <label for="save-query-desc">Description</label>
-      <textarea class="form-textarea" id="save-query-desc" placeholder="Optional description"></textarea>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="save-query-confirm-btn">Save</button>
-    </div>`;
-  return div;
+  return h('div', { class: 'form' },
+    h('div', { class: 'form-group' },
+      h('label', { for: 'save-query-name' }, 'Query Name'),
+      h('input', { class: 'form-input', id: 'save-query-name', placeholder: 'e.g. Monthly Revenue' }),
+    ),
+    h('div', { class: 'form-group' },
+      h('label', { for: 'save-query-desc' }, 'Description'),
+      h('textarea', { class: 'form-textarea', id: 'save-query-desc', placeholder: 'Optional description' }),
+    ),
+    h('div', { class: 'modal-footer' },
+      h('button', { type: 'button', class: 'btn btn-secondary', 'data-dismiss': 'modal' }, 'Cancel'),
+      h('button', { type: 'button', class: 'btn btn-primary', id: 'save-query-confirm-btn' }, 'Save'),
+    ),
+  );
 }
 
 // ── Private ───────────────────────────────────────────────────────────────────
@@ -167,12 +166,13 @@ export const EditorFeature = {
       try {
         const q = await QueryService.get(id);
         Router.navigate('editor');
-        // Brief delay — CodeMirror needs to be visible before dispatch works.
-        setTimeout(() => {
+        // Wait for the next paint — CodeMirror requires its container to be
+        // visible and laid out before accepting dispatch calls.
+        requestAnimationFrame(() => {
           EditorFeature.setSql(q.sql_text);
           const sel = document.getElementById('connection-select');
           if (q.connection_id) sel.value = q.connection_id;
-        }, 100);
+        });
       } catch(err) { Toast.error(err.message); }
     });
 

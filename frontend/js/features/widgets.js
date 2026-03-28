@@ -9,6 +9,7 @@ import { Charts } from '../charts/charts.js';
 import { QueryService } from '../services/query.service.js';
 import { DashboardService } from '../services/dashboard.service.js';
 import { populateSelect } from '../ui/templates.js';
+import { h } from '../core/dom.js';
 
 // ── Reactive state ────────────────────────────────────────────────────────────
 const widgets$ = signal([]);
@@ -16,45 +17,45 @@ let _widgetGrid = null;
 
 // ── Form factory ──────────────────────────────────────────────────────────────
 function _addWidgetFormEl(queries) {
-  const div = document.createElement('div');
-  div.className = 'form';
-  div.innerHTML = `
-    <div class="form-group">
-      <label for="widget-query-id">Saved Query</label>
-      <select class="select" id="widget-query-id"></select>
-    </div>
-    <div class="form-group">
-      <label for="widget-title">Widget Title</label>
-      <input class="form-input" id="widget-title" placeholder="Optional title" />
-    </div>
-    <div class="form-group">
-      <label for="widget-chart-type">Chart Type</label>
-      <select class="select" id="widget-chart-type">
-        <option value="table">Table</option>
-        <option value="bar">Bar Chart</option>
-        <option value="line">Line Chart</option>
-        <option value="pie">Pie Chart</option>
-        <option value="scatter">Scatter</option>
-      </select>
-    </div>
-    <div id="widget-col-selectors" class="hidden">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="widget-x-col">X Column (labels)</label>
-          <select class="select" id="widget-x-col"></select>
-        </div>
-        <div class="form-group">
-          <label for="widget-y-col">Y Column (values)</label>
-          <select class="select" id="widget-y-col"></select>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-      <button type="button" class="btn btn-primary" id="add-widget-confirm">Add Widget</button>
-    </div>`;
-  populateSelect(div.querySelector('#widget-query-id'), queries, q => q.id, q => q.name);
-  return div;
+  const querySelect = h('select', { class: 'select', id: 'widget-query-id' });
+  populateSelect(querySelect, queries, q => q.id, q => q.name);
+
+  return h('div', { class: 'form' },
+    h('div', { class: 'form-group' },
+      h('label', { for: 'widget-query-id' }, 'Saved Query'),
+      querySelect,
+    ),
+    h('div', { class: 'form-group' },
+      h('label', { for: 'widget-title' }, 'Widget Title'),
+      h('input', { class: 'form-input', id: 'widget-title', placeholder: 'Optional title' }),
+    ),
+    h('div', { class: 'form-group' },
+      h('label', { for: 'widget-chart-type' }, 'Chart Type'),
+      h('select', { class: 'select', id: 'widget-chart-type' },
+        h('option', { value: 'table' },   'Table'),
+        h('option', { value: 'bar' },     'Bar Chart'),
+        h('option', { value: 'line' },    'Line Chart'),
+        h('option', { value: 'pie' },     'Pie Chart'),
+        h('option', { value: 'scatter' }, 'Scatter'),
+      ),
+    ),
+    h('div', { id: 'widget-col-selectors', class: 'hidden' },
+      h('div', { class: 'form-row' },
+        h('div', { class: 'form-group' },
+          h('label', { for: 'widget-x-col' }, 'X Column (labels)'),
+          h('select', { class: 'select', id: 'widget-x-col' }),
+        ),
+        h('div', { class: 'form-group' },
+          h('label', { for: 'widget-y-col' }, 'Y Column (values)'),
+          h('select', { class: 'select', id: 'widget-y-col' }),
+        ),
+      ),
+    ),
+    h('div', { class: 'modal-footer' },
+      h('button', { type: 'button', class: 'btn btn-secondary', 'data-dismiss': 'modal' }, 'Cancel'),
+      h('button', { type: 'button', class: 'btn btn-primary', id: 'add-widget-confirm' }, 'Add Widget'),
+    ),
+  );
 }
 
 // ── Private handlers ──────────────────────────────────────────────────────────
@@ -87,15 +88,20 @@ async function _loadWidgetData(widget, chartsMap) {
   }
 }
 
-async function _delete(widgetId) {
-  if (!confirm('Remove this widget?')) return;
-  try {
-    await DashboardService.deleteWidget(Store.getDashboardId(), widgetId);
-    Toast.success('Widget removed');
-    // Optimistically remove from DOM, then sync signal.
-    _widgetGrid?.removeWidget(widgetId);
-    widgets$.update(ws => ws.filter(w => w.id !== widgetId));
-  } catch(err) { Toast.error(err.message); }
+function _delete(widgetId) {
+  Modal.confirm({
+    title:        'Remove Widget',
+    message:      'This widget will be removed from the dashboard.',
+    confirmLabel: 'Remove',
+    onConfirm: async () => {
+      try {
+        await DashboardService.deleteWidget(Store.getDashboardId(), widgetId);
+        Toast.success('Widget removed');
+        _widgetGrid?.removeWidget(widgetId);
+        widgets$.update(ws => ws.filter(w => w.id !== widgetId));
+      } catch(err) { Toast.error(err.message); }
+    },
+  });
 }
 
 async function _openAddModal() {

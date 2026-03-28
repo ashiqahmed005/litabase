@@ -5,6 +5,8 @@ import { signal } from '../framework/signal.js';
 import { Events } from '../framework/events.js';
 import { Router } from '../core/router.js';
 import { Toast } from '../ui/toast.js';
+import { Modal } from '../ui/modal.js';
+import { Utils } from '../core/utils.js';
 import { QueryList } from '../components/QueryList.js';
 import { QueryService } from '../services/query.service.js';
 
@@ -35,13 +37,19 @@ function _openInEditor(id) {
   Events.emit('query:open', { id });
 }
 
-async function _delete(id) {
-  if (!confirm('Delete this query?')) return;
-  try {
-    await QueryService.delete(id);
-    Toast.success('Query deleted');
-    _loadPage();
-  } catch(err) { Toast.error(err.message); }
+function _delete(id) {
+  Modal.confirm({
+    title: 'Delete Query',
+    message: 'This saved query will be permanently deleted.',
+    confirmLabel: 'Delete',
+    onConfirm: async () => {
+      try {
+        await QueryService.delete(id);
+        Toast.success('Query deleted');
+        _loadPage();
+      } catch(err) { Toast.error(err.message); }
+    },
+  });
 }
 
 // ── Public ────────────────────────────────────────────────────────────────────
@@ -59,10 +67,10 @@ export const QueriesFeature = {
       _loadPage();
     });
 
-    document.getElementById('queries-search').addEventListener('input', (e) => {
+    document.getElementById('queries-search').addEventListener('input', Utils.debounce((e) => {
       const term = e.target.value.trim();
       items$.set(term && _fuse ? _fuse.search(term).map(r => r.item) : _allQueries);
-    });
+    }, 200));
 
     // Refresh when a query is saved from the editor.
     Events.on('query:saved', _loadPage);

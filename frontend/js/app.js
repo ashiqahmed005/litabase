@@ -34,6 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', (e) => { e.preventDefault(); Router.navigate(btn.dataset.page); });
   });
 
+  // Sidebar toggle — persist state across page refreshes.
+  const _sidebar = document.getElementById('sidebar');
+  if (localStorage.getItem('sidebar:collapsed') === '1') _sidebar.classList.add('collapsed');
+  document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+    const collapsed = _sidebar.classList.toggle('collapsed');
+    localStorage.setItem('sidebar:collapsed', collapsed ? '1' : '0');
+  });
+
   // Kick off auth check — this is the single entry point for the app.
   AuthFeature.tryAutoLogin();
 });
