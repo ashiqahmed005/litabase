@@ -25,7 +25,7 @@
   "devDependencies": {
     "@types/sortablejs": "^1.15.9",
     "@vitest/coverage-v8": "^4.1.2",
-    "eslint": "^9.39.4",
+    "eslint": "^10.1.0",
     "eslint-plugin-import": "^2.32.0",
     "jsdom": "^29.0.1",
     "vite": "^5.2.0",
