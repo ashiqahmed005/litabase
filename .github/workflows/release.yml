@@ -13,7 +13,7 @@ jobs:
       contents: write   # required to create a release
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # full history so release notes can compare tags
 
